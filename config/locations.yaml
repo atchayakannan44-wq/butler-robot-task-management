@@ -1,0 +1,19 @@
+home:
+  x: 0
+  y: 0
+
+kitchen:
+  x: 3
+  y: 0
+
+table1:
+  x: 6
+  y: 3
+
+table2:
+  x: 6
+  y: 0
+
+table3:
+  x: 6
+  y: -3
