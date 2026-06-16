@@ -20,6 +20,8 @@ class RobotState(Enum):
 
     COMPLETED = 7
 
+    CANCELLED = 8
+
 
 class NavigationNode:
 
@@ -45,6 +47,8 @@ class TaskManager:
 
         self.navigator = NavigationNode()
 
+        self.cancel_requested = False
+
     def set_state(self, state):
 
         self.state = state
@@ -59,14 +63,21 @@ class TaskManager:
 
         return response.lower() == "y"
 
+    def cancel_order(self):
+
+        self.cancel_requested = True
+
+        print("\nORDER CANCELLED")
+
+    # Scenario 1,2,3
     def deliver_order(self, table):
 
-        # Home -> Kitchen
-        self.set_state(RobotState.GO_TO_KITCHEN)
+        self.set_state(
+            RobotState.GO_TO_KITCHEN
+        )
 
         self.navigator.navigate("kitchen")
 
-        # Wait Kitchen Confirmation
         self.set_state(
             RobotState.WAIT_KITCHEN_CONFIRM
         )
@@ -88,14 +99,12 @@ class TaskManager:
 
             return
 
-        # Kitchen -> Table
         self.set_state(
             RobotState.GO_TO_TABLE
         )
 
         self.navigator.navigate(table)
 
-        # Wait Table Confirmation
         self.set_state(
             RobotState.WAIT_TABLE_CONFIRM
         )
@@ -136,9 +145,38 @@ class TaskManager:
 
         print("\nDelivery Completed Successfully")
 
+    # Scenario 4A
+    def deliver_order_cancel_kitchen(self):
+
+        self.set_state(
+            RobotState.GO_TO_KITCHEN
+        )
+
+        self.cancel_order()
+
+        if self.cancel_requested:
+
+            self.set_state(
+                RobotState.CANCELLED
+            )
+
+            self.set_state(
+                RobotState.RETURN_HOME
+            )
+
+            self.navigator.navigate("home")
+
+            return
+
 
 if __name__ == "__main__":
 
     robot = TaskManager()
 
-    robot.deliver_order("table1")
+    # Uncomment ONE at a time
+
+    # Scenario 1 / 2 / 3
+    # robot.deliver_order("table1")
+
+    # Scenario 4A
+    robot.deliver_order_cancel_kitchen()
